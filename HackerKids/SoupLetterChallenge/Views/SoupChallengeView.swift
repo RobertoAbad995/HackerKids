@@ -21,16 +21,21 @@ struct SoupChallengeView: View {
         .onAppear {
             viewModel.startGame()
         }
-//        .sheet(isPresented: $viewModel.win, content: {
-//            VStack {
-//                Text("You won!")
-//                controls
-//            }
-//        })
         .popover(isPresented: $viewModel.win) {
             VStack {
                 Text("")
                 Text("You won!")
+                // Marcador de tiempo
+                HStack {
+                    Text("Tiempo:")
+                        .font(.headline)
+                    Text(viewModel.tiempoFormateado)
+                        .font(.body)
+                        .monospacedDigit()
+                }
+                .padding()
+                .background(Color.blue.opacity(0.1))
+                .cornerRadius(10)
                 controls
             }
         }

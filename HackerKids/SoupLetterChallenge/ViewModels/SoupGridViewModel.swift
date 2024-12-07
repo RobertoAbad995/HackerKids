@@ -11,13 +11,35 @@ import UIKit
 class SoupGridViewModel: ObservableObject {
     @Published var gridSize: Int = 10
     @Published var grid: [[Character]] = []
-    @Published var challengeWords: [String] = ["ALMENDRA", "MIAMOR", "BLABLABLA", "oreo", "kaka"]
+    @Published var challengeWords: [String] = ["NEGRO", "OSO", "ROBERTO", "WEED", "SATURNO"]
     @Published var selectedPositions: [GridPosition] = [] // Posiciones seleccionadas temporalmente
     @Published var correctWordsPositions: Set<GridPosition> = [] // Palabras correctamente seleccionadas
     @Published var foundWords: Set<String> = [] // Palabras encontradas
     @Published var win: Bool = false
     @Published var counter: Int = 0
     let isIPad: Bool = UIDevice.current.userInterfaceIdiom == .pad
+    @Published private(set) var tiempoTranscurrido = 0 // Tiempo en segundos
+    private var timer: Timer?
+
+    var tiempoFormateado: String {
+        let minutos = tiempoTranscurrido / 60
+        let segundosRestantes = tiempoTranscurrido % 60
+        return String(format: "%02d:%02d", minutos, segundosRestantes)
+    }
+
+    // Inicia el temporizador
+    func iniciarTimer() {
+        detenerTimer() // Asegura que no haya un timer previo corriendo
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            self?.tiempoTranscurrido += 1
+        }
+    }
+
+    // Detiene el temporizador
+    func detenerTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
 
     func startGame() {
         //GENERAR ARRAY VACIO
@@ -32,6 +54,9 @@ class SoupGridViewModel: ObservableObject {
         placeWordsInGrid()
         // Rellenar el resto con letras aleatorias
         fillEmptySpaces()
+        detenerTimer()
+        tiempoTranscurrido = 0
+        iniciarTimer()
     }
     func getGridSize() -> Int {
         if isIPad {
@@ -123,6 +148,7 @@ class SoupGridViewModel: ObservableObject {
             if challengeWords.count == foundWords.count {
                 win = true
                 counter += 1
+                detenerTimer()
             }
         } else {
             //La palabra correcta no es la misma, validar inicio de secuencia entonces
@@ -130,7 +156,7 @@ class SoupGridViewModel: ObservableObject {
             let prefix = selectedPositions.prefix(selectedPositions.count).map { String(grid[$0.row][$0.col]) }.joined()
             
             // Verificar si alguna palabra esperada comienza con ese prefijo
-            if !challengeWords.contains{ $0.hasPrefix(prefix) } {
+            if !challengeWords.contains(where: { $0.hasPrefix(prefix) }) {
                 //se han seleccionado solo errores
                 print("No existe esta secuencia: \(selectedWord)")
                 if let last = selectedPositions.last {

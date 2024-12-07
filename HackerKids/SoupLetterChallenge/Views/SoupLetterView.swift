@@ -20,18 +20,20 @@ struct SoupLetterView: View {
         HStack {
             Text(String(viewModel.grid[row][col]))
                 .foregroundStyle(Color.black)
-                .font(.system(size: 24))
+                .font(.system(size: 20))
+                .bold()
+                .shadow(color: .gray.opacity(0.3), radius: 4, x: 2, y: 2)
         }
-        .padding(viewModel.isIPad ? 10:3)
+        .padding(viewModel.isIPad ? 10:0)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         .background(setColor())
-        .cornerRadius(5)
+        .cornerRadius(6)
     }
     func setColor() -> Color {
         if viewModel.selectedPositions.contains(GridPosition(row: row, col: col)) {
             return .orange
         } else {
-            return viewModel.isCorrectPosition(row: row, col: col) ? Color.green : Color.blue.opacity(0.3)
+            return viewModel.isCorrectPosition(row: row, col: col) ? Color.green : Color.white
         }
     }
 }
