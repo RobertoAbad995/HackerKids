@@ -25,6 +25,7 @@ struct SoupLetterView: View {
                 .shadow(color: .gray.opacity(0.3), radius: 4, x: 2, y: 2)
         }
         .padding(viewModel.isIPad ? 10:0)
+        .padding(.vertical, 5)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         .background(setColor())
         .cornerRadius(6)

@@ -25,7 +25,7 @@ struct HackerKidsApp: App {
 
     var body: some Scene {
         WindowGroup {
-            SoupChallengeView()
+            HomeView()
         }
 //        .modelContainer(sharedModelContainer)
     }

@@ -9,9 +9,10 @@ import Foundation
 import UIKit
 
 class SoupGridViewModel: ObservableObject {
-    @Published var gridSize: Int = 10
+    @Published var gridSize: Int = 0
+    @Published var difficultyLevel: DifficultyLevel = .easy
     @Published var grid: [[Character]] = []
-    @Published var challengeWords: [String] = ["NEGRO", "OSO", "ROBERTO", "WEED", "SATURNO"]
+    @Published var challengeWords: [String] = ["GREEN", "OSO", "ROBERTO", "WEED", "SATURNO", "LAU♡"]
     @Published var selectedPositions: [GridPosition] = [] // Posiciones seleccionadas temporalmente
     @Published var correctWordsPositions: Set<GridPosition> = [] // Palabras correctamente seleccionadas
     @Published var foundWords: Set<String> = [] // Palabras encontradas
@@ -27,21 +28,8 @@ class SoupGridViewModel: ObservableObject {
         return String(format: "%02d:%02d", minutos, segundosRestantes)
     }
 
-    // Inicia el temporizador
-    func iniciarTimer() {
-        detenerTimer() // Asegura que no haya un timer previo corriendo
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            self?.tiempoTranscurrido += 1
-        }
-    }
-
-    // Detiene el temporizador
-    func detenerTimer() {
-        timer?.invalidate()
-        timer = nil
-    }
-
     func startGame() {
+        //START NEW GAME
         //GENERAR ARRAY VACIO
         let gridLimit = getGridSize()
         gridSize = gridLimit
@@ -62,7 +50,7 @@ class SoupGridViewModel: ObservableObject {
         if isIPad {
             return 15
         } else {
-            return 10
+            return 14
         }
     }
 
@@ -189,6 +177,33 @@ class SoupGridViewModel: ObservableObject {
     func isWordFound(_ word: String) -> Bool {
         return foundWords.contains(word)
     }
+    // Inicia el temporizador
+    func iniciarTimer() {
+        detenerTimer() // Asegura que no haya un timer previo corriendo
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            self?.tiempoTranscurrido += 1
+        }
+    }
+
+    // Detiene el temporizador
+    func detenerTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+    func addChallenge(challenge: ChallengeModel?) {
+        if let challenge {
+            self.difficultyLevel = challenge.diffuculty
+            self.challengeWords = challenge.challengeWords
+        }
+        startGame()
+    }
+}
+enum DifficultyLevel: Hashable {
+    case easy
+    case medium
+    case hard
+    case impossible
+    case custom(Int)
 }
 // Definir las direcciones posibles
 enum Direction {

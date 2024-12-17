@@ -8,7 +8,17 @@
 import SwiftUI
 
 struct SoupChallengeView: View {
+    @Environment(\.presentationMode) private var presentationMode
+    let onExit: () -> Void
     @StateObject private var viewModel = SoupGridViewModel()
+    @State private var showExitConfirmation = false
+    var challenge: ChallengeModel?
+    
+    
+    init(onExit: @escaping (() -> Void), challenge: ChallengeModel? = nil) {
+        self.onExit = onExit
+        self.challenge = challenge
+    }
 
     var body: some View {
         VStack {
@@ -16,10 +26,13 @@ struct SoupChallengeView: View {
                 title
                 gameView
                 controls
+                Button("Volver a Home") {
+                                showExitConfirmation = true
+                }
             }
         }
         .onAppear {
-            viewModel.startGame()
+            viewModel.addChallenge(challenge: challenge)
         }
         .popover(isPresented: $viewModel.win) {
             VStack {
@@ -39,6 +52,15 @@ struct SoupChallengeView: View {
                 controls
             }
         }
+        .navigationTitle("Juego")
+        .navigationBarBackButtonHidden()
+        .alert("¿Deseas salir del juego?", isPresented: $showExitConfirmation) {
+            Button("Cancelar", role: .cancel) {}
+            Button("Salir", role: .destructive, action: {
+                self.presentationMode.wrappedValue.dismiss()
+                onExit()
+            })
+        }
     }
     var title: some View {
         VStack {
@@ -47,13 +69,9 @@ struct SoupChallengeView: View {
             Text("by RobertSoft")
                 .font(.subheadline)
         }
-        .padding()
     }
     var gameView: some View {
-        VStack {
-            SoupGridView(viewModel: viewModel)
-        }
-        .padding()
+        SoupGridView(viewModel: viewModel)
     }
     var controls: some View {
         HStack {
@@ -66,5 +84,5 @@ struct SoupChallengeView: View {
     }
 }
 #Preview {
-    SoupChallengeView()
+    SoupChallengeView(onExit: {})
 }
