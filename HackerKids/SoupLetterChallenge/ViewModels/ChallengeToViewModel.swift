@@ -8,5 +8,5 @@
 import Foundation
 
 class ChallengeToViewModel: ObservableObject {
-    var challenge: ChallengeModel = ChallengeModel()
+    @Published var challenge: ChallengeModel = ChallengeModel()
 }

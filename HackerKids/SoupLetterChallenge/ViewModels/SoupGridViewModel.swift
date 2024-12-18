@@ -198,12 +198,14 @@ class SoupGridViewModel: ObservableObject {
         startGame()
     }
 }
-enum DifficultyLevel: Hashable {
+enum DifficultyLevel: String, Identifiable, CaseIterable {
     case easy
     case medium
     case hard
     case impossible
-    case custom(Int)
+    case custom
+    
+    var id: String { self.rawValue }
 }
 // Definir las direcciones posibles
 enum Direction {

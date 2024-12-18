@@ -97,12 +97,6 @@ struct SoupGridView: View {
         .cornerRadius(10)
     }
 }
-extension UIColor {
-    // Convierte UIColor a Color
-    func toColor() -> Color {
-        return Color(self)
-    }
-}
 #Preview {
     SoupGridView(viewModel: SoupGridViewModel())
 }

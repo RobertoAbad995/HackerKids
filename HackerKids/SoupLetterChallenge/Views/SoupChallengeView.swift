@@ -52,8 +52,6 @@ struct SoupChallengeView: View {
                 controls
             }
         }
-        .navigationTitle("Juego")
-        .navigationBarBackButtonHidden()
         .alert("¿Deseas salir del juego?", isPresented: $showExitConfirmation) {
             Button("Cancelar", role: .cancel) {}
             Button("Salir", role: .destructive, action: {
