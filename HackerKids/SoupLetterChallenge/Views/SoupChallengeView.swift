@@ -63,7 +63,7 @@ struct SoupChallengeView: View {
     var title: some View {
         VStack {
             Text("Sopita challenge")
-                .font(.largeTitle)
+                .font(.title)
             Text("by RobertSoft")
                 .font(.subheadline)
         }

@@ -10,7 +10,6 @@ import SwiftUI
 struct HomeView: View {
     @State var infoView: Bool = false
     @State var gameRoute: GameRoute = .home
-
     var body: some View {
         NavigationStack {
             VStack {
@@ -46,13 +45,9 @@ struct HomeView: View {
                 }
             }
             .popover(isPresented: $infoView) {
-                VStack {
-                    Text("Sopita challenge")
-                    Text("by Roberto Ramirez")
-                    Text("roberto.rmzabad@gmail.com")
-                    Text("https://github.com/RobertoAbad505/HackerKids")
-                    Text("https://www.instagram.com/roberto.abad21/")
-                }
+                AboutAppView()
+                    .background(Color.white.opacity(0.9).blur(radius: 10))
+                    .edgesIgnoringSafeArea(.all)
             }
         }
     }
