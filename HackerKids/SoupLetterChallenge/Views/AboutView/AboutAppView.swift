@@ -40,20 +40,21 @@ struct AboutAppView: View {
             } placeholder: {
                 ProgressView()
             }
-            .frame(width: 130, height: 130)
+            .frame(width: 140, height: 140)
             .padding(5)
-            .background(Color.black)
+            .background(LinearGradient(colors: [.blue, .white, .blue], startPoint: .bottomLeading, endPoint: .top))
             .clipShape(Circle())
             Text(viewModel.gitHubUser?.bio ?? "")
                 .font(.body)
             HStack {
-                getButton(.mail)
+                getButton(.linkedIn)
                 getButton(.github)
                 getButton(.whatsApp)
                 getButton(.ig)
             }
             HStack {
                 Spacer()
+                getButton(.mail)
                 getButton(.phone)
                 getButton(.text)
                 Spacer()
@@ -86,7 +87,7 @@ struct AboutAppView: View {
             color = .pink
         case .github:
             img = Image("gitIcon")
-            color = Color.black
+            color = Color(red: 27 / 255, green: 31 / 255, blue: 35 / 255)
         case .mail:
             img = Image(systemName: "envelope")
             color = .blue
@@ -99,12 +100,15 @@ struct AboutAppView: View {
         case .whatsApp:
             color = .green
             img = Image("whatsAppIcon")
+        case .linkedIn:
+            img = Image("linkedInIcon")
+            color = .white
         }
-        var iconHeight = 35.0
-        var iconWidth = 35.0
+        var iconHeight = 37.0
+        var iconWidth = 37.0
         if source == .mail || source == .text || source == .phone {
-            iconHeight = 27.0
-            iconWidth = 33.0
+            iconHeight = 28.0
+            iconWidth = 34.0
         }
         return Button(action: {
             openUrl(source)
@@ -119,8 +123,8 @@ struct AboutAppView: View {
                 .foregroundStyle(Color.white)
                 .clipShape(Circle())
         })
-        .padding(3)
-        .background(Color(uiColor: .lightGray))
+        .padding(1)
+        .background(LinearGradient(colors: [.white, .gray, .white, .gray], startPoint: .bottomLeading, endPoint: .top))
         .clipShape(Circle())
         .shadow(color: Color.purple.opacity(0.5), radius: 10, x: 5, y: 5)
     }
@@ -147,6 +151,8 @@ struct AboutAppView: View {
         case .whatsApp:
             sendMessageOnWhatsApp(phoneNumber: "+14709659798",
                                   message: "Hey let's work together Roberto!")
+        case .linkedIn:
+            url = URL(string: "https://www.linkedin.com/in/robertoabad95/")
         }
         if let url = url {
             if #available(iOS 10.0, *) {
@@ -182,4 +188,5 @@ enum ContactSource {
     case phone
     case text
     case whatsApp
+    case linkedIn
 }

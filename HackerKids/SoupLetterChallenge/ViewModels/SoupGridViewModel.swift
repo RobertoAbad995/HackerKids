@@ -12,7 +12,7 @@ class SoupGridViewModel: ObservableObject {
     @Published var gridSize: Int = 0
     @Published var difficultyLevel: DifficultyLevel = .easy
     @Published var grid: [[Character]] = []
-    @Published var challengeWords: [String] = ["GREEN", "OSO", "ROBERTO", "WEED", "SATURNO", "LAU♡"]
+    @Published var challengeWords: [String] = ["GREEN", "OSO", "ROBERTO", "WEED", "SATURNO", "LAU♡", "LAU"]
     @Published var selectedPositions: [GridPosition] = [] // Posiciones seleccionadas temporalmente
     @Published var correctWordsPositions: Set<GridPosition> = [] // Palabras correctamente seleccionadas
     @Published var foundWords: Set<String> = [] // Palabras encontradas
@@ -21,6 +21,7 @@ class SoupGridViewModel: ObservableObject {
     let isIPad: Bool = UIDevice.current.userInterfaceIdiom == .pad
     @Published private(set) var tiempoTranscurrido = 0 // Tiempo en segundos
     private var timer: Timer?
+    private var wordDirection: Direction?
 
     var tiempoFormateado: String {
         let minutos = tiempoTranscurrido / 60
@@ -124,8 +125,22 @@ class SoupGridViewModel: ObservableObject {
         // Convert the selected characters to a string
         let selectedWord = selectedPositions.map { String(grid[$0.row][$0.col]) }.joined()
         
+        //Obtener las palabras restantes
+        let remainingChallengeWords = challengeWords.filter { !foundWords.contains($0) }
+        print("secuencia ingresada: \(selectedWord), POS: \(selectedPositions.last)")
+        if selectedPositions.count > 1 {
+            //validar click en columna o fila consecuente
+            if validOnePositionMove() == nil {
+                print("New selected direction!! RESTART SEQUENCE")
+                if let last = selectedPositions.last {
+                    selectedPositions = [last]
+                    return
+                }
+            }
+        }
         // Verify if the selected word is in the list of valid words
-        if challengeWords.contains(selectedWord) {
+        let possibleWords = remainingChallengeWords.filter { $0.hasPrefix(selectedWord) }
+        if  possibleWords.count  == 1 && remainingChallengeWords.contains(selectedWord) {
             // Mark all selected positions as correct
             for position in selectedPositions {
                 correctWordsPositions.insert(position) // Store individual positions as (row, col)
@@ -133,6 +148,7 @@ class SoupGridViewModel: ObservableObject {
             foundWords.insert(selectedWord)
             // Limpiar las posiciones seleccionadas después de validar
             clearCurrentSelection()
+            wordDirection = nil
             if challengeWords.count == foundWords.count {
                 win = true
                 counter += 1
@@ -144,16 +160,64 @@ class SoupGridViewModel: ObservableObject {
             let prefix = selectedPositions.prefix(selectedPositions.count).map { String(grid[$0.row][$0.col]) }.joined()
             
             // Verificar si alguna palabra esperada comienza con ese prefijo
-            if !challengeWords.contains(where: { $0.hasPrefix(prefix) }) {
+            if !remainingChallengeWords.contains(where: { $0.hasPrefix(prefix) }) {
                 //se han seleccionado solo errores
                 print("No existe esta secuencia: \(selectedWord)")
+                wordDirection = nil
                 if let last = selectedPositions.last {
                     selectedPositions = [last]
                 }
-            } else {
-                print("secuencia ingresada: \(selectedWord)")
             }
         }
+    }
+    func validOnePositionMove() -> Direction? {
+        let first = selectedPositions.first!
+        let from = selectedPositions[selectedPositions.count - 2]
+        let to = selectedPositions.last!
+        
+        // Determinar la dirección inicial si aún no se ha establecido
+            if wordDirection == nil {
+                // Dirección horizontal
+                if first.row == to.row && abs(first.col - to.col) == 1 {
+                    wordDirection = .horizontal
+                }
+                // Dirección vertical
+                else if first.col == to.col && abs(first.row - to.row) == 1 {
+                    wordDirection = .vertical
+                }
+                // Dirección diagonal
+                else if abs(first.row - to.row) == 1 && abs(first.col - to.col) == 1 {
+                    wordDirection = .diagonal
+                } else {
+                    // Movimiento inicial inválido
+                    return nil
+                }
+            }
+            
+            // Validar que el movimiento actual es consistente con la dirección inicial
+            switch wordDirection {
+            case .horizontal:
+                // Movimiento horizontal válido: misma fila, columnas adyacentes
+                if from.row == to.row && abs(from.col - to.col) == 1 {
+                    return wordDirection
+                }
+            case .vertical:
+                // Movimiento vertical válido: misma columna, filas adyacentes
+                if from.col == to.col && abs(from.row - to.row) == 1 {
+                    return wordDirection
+                }
+            case .diagonal:
+                // Movimiento diagonal válido: diferencia absoluta de 1 en filas y columnas
+                if abs(from.row - to.row) == 1 && abs(from.col - to.col) == 1 {
+                    return wordDirection
+                }
+            case .none:
+                break
+            }
+            
+            // Si el movimiento actual no coincide con la dirección inicial, es inválido
+            wordDirection = nil
+            return nil
     }
     func getDirection(_ first: (row: Int, col: Int), second: (row: Int, col: Int)) -> Direction? {
         if first.row == second.row {
@@ -172,6 +236,7 @@ class SoupGridViewModel: ObservableObject {
     // Limpiar las posiciones seleccionadas temporalmente
     func clearCurrentSelection() {
         selectedPositions.removeAll()
+        self.wordDirection
     }
     // Comprobar si una palabra ya ha sido encontrada
     func isWordFound(_ word: String) -> Bool {

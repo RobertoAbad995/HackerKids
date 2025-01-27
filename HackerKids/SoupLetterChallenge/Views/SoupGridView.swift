@@ -39,8 +39,6 @@ struct SoupGridView: View {
                             if viewModel.selectedPositions.count >= 2 {
                                 viewModel.validateSelection()
                             }
-                            // Handle letter selection here if needed
-                            print("Selected: \(viewModel.grid[row][col])")
                         }, label: {
                             SoupLetterView(viewModel: viewModel, row: row, col: col)
                         })

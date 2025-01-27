@@ -45,10 +45,10 @@ struct HomeView: View {
                     HomeView()
                 }
             }
-            .popover(isPresented: $infoView) {
+            .sheet(isPresented: $infoView) {
                 ZStack {
-                    Color.clear.blur(radius: 0.5)
                     AboutAppView(self.viewModel)
+                        .background(Color.clear.blur(radius: 0.5))
                 }
                 .edgesIgnoringSafeArea(.all)
             }
