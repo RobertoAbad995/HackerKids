@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct HomeView: View {
+    @State var viewModel: AboutAppViewModel = AboutAppViewModel()
     @State var infoView: Bool = false
     @State var gameRoute: GameRoute = .home
     var body: some View {
@@ -45,9 +46,11 @@ struct HomeView: View {
                 }
             }
             .popover(isPresented: $infoView) {
-                AboutAppView()
-                    .background(Color.white.opacity(0.9).blur(radius: 10))
-                    .edgesIgnoringSafeArea(.all)
+                ZStack {
+                    Color.clear.blur(radius: 0.5)
+                    AboutAppView(self.viewModel)
+                }
+                .edgesIgnoringSafeArea(.all)
             }
         }
     }

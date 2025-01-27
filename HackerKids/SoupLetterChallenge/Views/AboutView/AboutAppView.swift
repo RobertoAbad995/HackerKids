@@ -5,18 +5,22 @@
 //  Created by Roberto Ramirez on 1/26/25.
 //
 
+import MessageUI
 import SwiftUI
 
 struct AboutAppView: View {
     @ObservedObject var viewModel: AboutAppViewModel
     @State private var showMailView = false
-    init(viewModel: AboutAppViewModel = AboutAppViewModel(), showMailView: Bool = false) {
+    @State private var isShowingMessageCompose = false
+    @State private var result: Result<MessageComposeResult, Error>? = nil
+    init(_ viewModel: AboutAppViewModel, showMailView: Bool = false) {
         self.viewModel = viewModel
         viewModel.getGitUser()
         self.showMailView = showMailView
     }
     var body: some View {
         VStack(spacing: 20) {
+            Spacer()
             Text("Sopita challenge")
                 .font(.largeTitle)
             HStack(spacing: 0) {
@@ -43,57 +47,82 @@ struct AboutAppView: View {
             Text(viewModel.gitHubUser?.bio ?? "")
                 .font(.body)
             HStack {
-                Button(action: {
-                    
-                }, label: {
-                    Image(systemName: "envelope")
-                        .font(.largeTitle)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .frame(width: 35, height: 35)
-                        .padding()
-                        .clipShape(Circle())
-                })
-                .padding()
-                .clipShape(Circle())
-                .shadow(color: Color.purple.opacity(0.5), radius: 10, x: 5, y: 5)
-                Button(action: {
-                    openGitHub()
-                }, label: {
-                    Image("gitIcon")
-                        .resizable()
-                        .frame(width: 35, height: 35)
-                        .padding()
-                        .background(Color.black)
-                        .clipShape(Circle())
-                })
-                .padding()
-                .clipShape(Circle())
-                .shadow(color: Color.purple.opacity(0.5), radius: 10, x: 5, y: 5)
-                Button(action: {
-                    openUrl(.ig)
-                }, label: {
-                    Image("igIcon")
-                        .resizable()
-                        .frame(width: 35, height: 35)
-                        .padding()
-                        .background(Color.pink)
-                        .clipShape(Circle())
-                })
-                .padding()
-                .clipShape(Circle())
-                .shadow(color: Color.purple.opacity(0.5), radius: 10, x: 5, y: 5)
+                getButton(.mail)
+                getButton(.github)
+                getButton(.whatsApp)
+                getButton(.ig)
             }
+            HStack {
+                Spacer()
+                getButton(.phone)
+                getButton(.text)
+                Spacer()
+            }
+            Spacer()
         }
         .padding()
+        .edgesIgnoringSafeArea(.all)
         .sheet(isPresented: $showMailView) {
             MailView(
                 recipients: [viewModel.developerEmailAddress],
                 subject: "Consulta desde la app",
-                body: "Hola, este es un mensaje generado desde la app."
+                body: "Hola, este es un mensaje generado desde la app Sopitas."
             )
         }
+        .sheet(isPresented: $isShowingMessageCompose) {
+            MessageComposeView(result: $result) { controller in
+                // Configura el mensaje aquí
+                controller.recipients = ["+1 470 965 9798"] // Número de teléfono
+                controller.body = "Hola, este es un mensaje generado desde la app Sopitas." // Texto del mensaje
+            }
+        }
+    }
+    func getButton(_ source: ContactSource) -> some View {
+        var img = Image("igIcon")
+        var color: Color = .pink
+        switch source {
+        case .ig:
+            img = Image("igIcon")
+            color = .pink
+        case .github:
+            img = Image("gitIcon")
+            color = Color.black
+        case .mail:
+            img = Image(systemName: "envelope")
+            color = .blue
+        case .phone:
+            img = Image(systemName: "phone")
+            color = .green
+        case .text:
+            img = Image(systemName: "bubble.left.and.text.bubble.right.fill")
+            color = .yellow
+        case .whatsApp:
+            color = .green
+            img = Image("whatsAppIcon")
+        }
+        var iconHeight = 35.0
+        var iconWidth = 35.0
+        if source == .mail || source == .text || source == .phone {
+            iconHeight = 27.0
+            iconWidth = 33.0
+        }
+        return Button(action: {
+            openUrl(source)
+        }, label: {
+            img
+                .resizable()
+                .frame(width: iconWidth, height: iconHeight)
+                .padding()
+                .background(
+                    color
+                )
+                .foregroundStyle(Color.white)
+                .clipShape(Circle())
+        })
+        .padding(3)
+        .background(Color(uiColor: .lightGray))
+        .clipShape(Circle())
+        .shadow(color: Color.purple.opacity(0.5), radius: 10, x: 5, y: 5)
     }
     func openGitHub() {
         openUrl(.github)
@@ -110,6 +139,14 @@ struct AboutAppView: View {
                 showMailView = true
             }
             return
+        case .phone:
+            url = URL(string: "tel:+14709659798")
+        case .text:
+            isShowingMessageCompose = true
+            return
+        case .whatsApp:
+            sendMessageOnWhatsApp(phoneNumber: "+14709659798",
+                                  message: "Hey let's work together Roberto!")
         }
         if let url = url {
             if #available(iOS 10.0, *) {
@@ -119,9 +156,30 @@ struct AboutAppView: View {
             }
         }
     }
+    func sendMessageOnWhatsApp(phoneNumber: String, message: String) {
+            // Asegúrate de codificar el mensaje y el número de teléfono en la URL
+            let encodedMessage = message.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+            let whatsappURLString = "https://wa.me/\(phoneNumber)?text=\(encodedMessage)"
+
+            // Convertir el string a una URL
+            guard let whatsappURL = URL(string: whatsappURLString) else {
+                print("Invalid WhatsApp URL")
+                return
+            }
+
+            // Verificar si el dispositivo puede abrir la URL
+            if UIApplication.shared.canOpenURL(whatsappURL) {
+                UIApplication.shared.open(whatsappURL, options: [:], completionHandler: nil)
+            } else {
+                print("WhatsApp is not installed on this device.")
+            }
+        }
 }
 enum ContactSource {
     case ig
     case github
     case mail
+    case phone
+    case text
+    case whatsApp
 }
