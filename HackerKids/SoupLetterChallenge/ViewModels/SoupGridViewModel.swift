@@ -12,7 +12,7 @@ class SoupGridViewModel: ObservableObject {
     @Published var gridSize: Int = 0
     @Published var difficultyLevel: DifficultyLevel = .easy
     @Published var grid: [[Character]] = []
-    @Published var challengeWords: [String] = ["GREEN", "OSO", "ROBERTO", "WEED", "SATURNO", "LAU♡", "LAU"]
+    @Published var challengeWords: [String] = ["GREEN", "OSO", "ROBERTO", "WEED", "SATURNO", "APOLLO", "ZEBRA", "STAR", "CALIFORNIA", "ICEBERG"]
     @Published var selectedPositions: [GridPosition] = [] // Posiciones seleccionadas temporalmente
     @Published var correctWordsPositions: Set<GridPosition> = [] // Palabras correctamente seleccionadas
     @Published var foundWords: Set<String> = [] // Palabras encontradas
@@ -175,49 +175,51 @@ class SoupGridViewModel: ObservableObject {
         let from = selectedPositions[selectedPositions.count - 2]
         let to = selectedPositions.last!
         
+        //abs() determina el valor absoluto entre dos numeros (negativos o positivos) y devuelve la distancia entre ellos.
+        // buscar que el valor absoluto siempre sea 1, lo que significa que todos los movimientos hechos son letras adyacentes.
         // Determinar la dirección inicial si aún no se ha establecido
-            if wordDirection == nil {
-                // Dirección horizontal
-                if first.row == to.row && abs(first.col - to.col) == 1 {
-                    wordDirection = .horizontal
-                }
-                // Dirección vertical
-                else if first.col == to.col && abs(first.row - to.row) == 1 {
-                    wordDirection = .vertical
-                }
-                // Dirección diagonal
-                else if abs(first.row - to.row) == 1 && abs(first.col - to.col) == 1 {
-                    wordDirection = .diagonal
-                } else {
-                    // Movimiento inicial inválido
-                    return nil
-                }
+        if wordDirection == nil {
+            // Dirección horizontal
+            if first.row == to.row && abs(first.col - to.col) == 1 {
+                wordDirection = .horizontal
             }
-            
-            // Validar que el movimiento actual es consistente con la dirección inicial
-            switch wordDirection {
-            case .horizontal:
-                // Movimiento horizontal válido: misma fila, columnas adyacentes
-                if from.row == to.row && abs(from.col - to.col) == 1 {
-                    return wordDirection
-                }
-            case .vertical:
-                // Movimiento vertical válido: misma columna, filas adyacentes
-                if from.col == to.col && abs(from.row - to.row) == 1 {
-                    return wordDirection
-                }
-            case .diagonal:
-                // Movimiento diagonal válido: diferencia absoluta de 1 en filas y columnas
-                if abs(from.row - to.row) == 1 && abs(from.col - to.col) == 1 {
-                    return wordDirection
-                }
-            case .none:
-                break
+            // Dirección vertical
+            else if first.col == to.col && abs(first.row - to.row) == 1 {
+                wordDirection = .vertical
             }
-            
-            // Si el movimiento actual no coincide con la dirección inicial, es inválido
-            wordDirection = nil
-            return nil
+            // Dirección diagonal
+            else if abs(first.row - to.row) == 1 && abs(first.col - to.col) == 1 {
+                wordDirection = .diagonal
+            } else {
+                // Movimiento inicial inválido
+                return nil
+            }
+        }
+        
+        // Validar que el movimiento actual es consistente con la dirección inicial
+        switch wordDirection {
+        case .horizontal:
+            // Movimiento horizontal válido: misma fila, columnas adyacentes
+            if from.row == to.row && abs(from.col - to.col) == 1 {
+                return wordDirection
+            }
+        case .vertical:
+            // Movimiento vertical válido: misma columna, filas adyacentes
+            if from.col == to.col && abs(from.row - to.row) == 1 {
+                return wordDirection
+            }
+        case .diagonal:
+            // Movimiento diagonal válido: diferencia absoluta de 1 en filas y columnas
+            if abs(from.row - to.row) == 1 && abs(from.col - to.col) == 1 {
+                return wordDirection
+            }
+        case .none:
+            break
+        }
+        
+        // Si el movimiento actual no coincide con la dirección inicial, es inválido
+        wordDirection = nil
+        return nil
     }
     func getDirection(_ first: (row: Int, col: Int), second: (row: Int, col: Int)) -> Direction? {
         if first.row == second.row {

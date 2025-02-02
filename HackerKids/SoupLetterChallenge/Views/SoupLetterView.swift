@@ -11,24 +11,24 @@ struct SoupLetterView: View {
     @ObservedObject var viewModel: SoupGridViewModel
     let row: Int
     let col: Int
+    let soupLetter: String
     init(viewModel: SoupGridViewModel, row: Int, col: Int) {
         self.viewModel = viewModel
         self.row = row
         self.col = col
+        self.soupLetter = String(viewModel.grid[row][col])
     }
     var body: some View {
-        HStack {
-            Text(String(viewModel.grid[row][col]))
+        VStack(alignment: .center, content: {
+            Text(soupLetter)
                 .foregroundStyle(Color.black)
                 .font(.system(size: 20))
                 .bold()
-                .shadow(color: .gray.opacity(0.3), radius: 4, x: 2, y: 2)
-        }
-        .padding(viewModel.isIPad ? 10:0)
-        .padding(.vertical, 5)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-        .background(setColor())
-        .cornerRadius(6)
+                .fixedSize(horizontal: true, vertical: true)
+                .padding(.horizontal, soupLetter == "I" ? 5:0)
+        })
+        .padding(5)
+        .background(setColor())// Marcar palabras encontradas
     }
     func setColor() -> Color {
         if viewModel.selectedPositions.contains(GridPosition(row: row, col: col)) {

@@ -23,14 +23,29 @@ struct SoupChallengeView: View {
     var body: some View {
         VStack {
             ScrollView {
-                title
-                gameView
-                controls
-                Button("Volver a Home") {
-                                showExitConfirmation = true
+                VStack {
+                    Spacer()
+                    title
+                    gameView
+                    wordsListView
+                    controls
+                    Spacer()
                 }
+                .background(
+                    ZStack {
+                        Spacer()
+                    }
+                    .background(Color.clear.blur(radius: 20))
+                    .edgesIgnoringSafeArea(.all)
+                )
+                .frame(maxWidth: .infinity, alignment: .init(horizontal: .center, vertical: .top))
             }
         }
+        .navigationBarBackButtonHidden()
+        .background(Image("universe_background")
+            .resizable()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .edgesIgnoringSafeArea(.all))
         .onAppear {
             viewModel.addChallenge(challenge: challenge)
         }
@@ -62,25 +77,60 @@ struct SoupChallengeView: View {
     }
     var title: some View {
         VStack {
-            Text("Sopita challenge")
-                .font(.title)
-            Text("by RobertSoft")
-                .font(.subheadline)
+            HStack(spacing: 30) {
+                Button(action: {
+                    showExitConfirmation.toggle()
+                }, label: {
+                    Image(systemName: "chevron.compact.backward")
+                        .resizable()
+                        .frame(width: 14, height: 24)
+                        .foregroundStyle(Color.black)
+                })
+                Image(systemName: "person")
+                    .resizable()
+                    .frame(width: 25, height: 25)
+                VStack {
+                    Text("Player 1 turn")
+                        .font(.title)
+                }
+                Spacer()
+            }
+            .padding()
         }
+        .background(.ultraThinMaterial)
+        .edgesIgnoringSafeArea(.top)
     }
     var gameView: some View {
         SoupGridView(viewModel: viewModel)
     }
     var controls: some View {
-        HStack {
-            Button(viewModel.counter > 0 ? "Nuevo juego!":"Comenzar!") {
-                viewModel.counter += 1
-                viewModel.startGame()
+        VStack {
+            HStack {
+                Button(action: {
+                    viewModel.counter += 1
+                    viewModel.startGame()
+                }, label: {
+                    HStack {
+                        Image(systemName: "arrow.clockwise")
+                            .resizable()
+                            .frame(width: 20, height: 25)
+                        Text(viewModel.counter > 0 ? "Nuevo juego!":"Reset turn")
+                    }
+                })
+                .foregroundStyle(Color.black)
+                .padding(.horizontal)
+                .padding(.vertical, 7)
+                .background(.ultraThinMaterial)
+                .cornerRadius(20)
             }
-            .padding()
         }
     }
+    // Grid de palabras que deben ser encontradas
+    var wordsListView: some View {
+        ChallengeWordsListView(viewModel: viewModel)
+    }
 }
+
 #Preview {
     SoupChallengeView(onExit: {})
 }
