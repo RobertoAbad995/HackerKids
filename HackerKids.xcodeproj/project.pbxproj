@@ -37,6 +37,14 @@
 			);
 			target = 6FD516E22CA5131D0052F1D3 /* HackerKids */;
 		};
+		6FE0A73A2D50174300E1C917 /* Exceptions for "HackerKids" folder in "HackerKidsTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				SoupLetterChallenge/Models/PlayerUser.swift,
+				SoupLetterChallenge/ViewModels/LoginViewModel.swift,
+			);
+			target = 6FD516F62CA5131F0052F1D3 /* HackerKidsTests */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -44,6 +52,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				6FD517092CA5131F0052F1D3 /* Exceptions for "HackerKids" folder in "HackerKids" target */,
+				6FE0A73A2D50174300E1C917 /* Exceptions for "HackerKids" folder in "HackerKidsTests" target */,
 			);
 			path = HackerKids;
 			sourceTree = "<group>";

@@ -10,16 +10,22 @@ import SwiftUI
 struct HomeView: View {
     @State var viewModel: AboutAppViewModel = AboutAppViewModel()
     @State var infoView: Bool = false
+    @State var loginView: Bool = false
     @State var gameRoute: GameRoute = .home
     var body: some View {
         NavigationStack {
             VStack {
+                Spacer()
                 title
                 startButton
                 challengeButton
                 highScoresButton
                 Spacer()
                 infoButton
+            }
+            .padding(.top)
+            .onAppear {
+                loginView.toggle()
             }
             .background(
                 LinearGradient(
@@ -52,6 +58,17 @@ struct HomeView: View {
                 }
                 .edgesIgnoringSafeArea(.all)
             }
+//            .overlay {
+//                if loginView {
+//                    LoginView()
+//                }
+//            }
+            .sheet(isPresented: $loginView) {
+                LoginView()
+            }
+            //            .popover(isPresented: $loginView) {
+            //                LoginView()
+            //            }
         }
     }
     var title: some View {
@@ -75,7 +92,6 @@ struct HomeView: View {
                 .foregroundColor(.blue)
                 .shadow(color: .gray, radius: 10, x: 5, y: 5) // Sombra para mayor profundidad
         }
-        .padding(.top, 250)
         .padding(.bottom, 10)
     }
     var startButton: some View {
@@ -92,7 +108,7 @@ struct HomeView: View {
             NavigationLink(destination: ChallengeToView(onExit: {
                 self.gameRoute = .home
             }), label: {
-                HomeButtonView(title: "Vs challenge", icon: "play")
+                HomeButtonView(title: "Vs challenge", icon: "flag.2.crossed")
             })
         }
     }
